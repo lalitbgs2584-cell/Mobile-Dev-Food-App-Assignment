@@ -1,40 +1,21 @@
-import "react-native-gesture-handler";
-import React, { useEffect } from "react";
-import { SafeAreaProvider } from "react-native-safe-area-context";
-import { NavigationContainer } from "@react-navigation/native";
-import SplashScreen from "./src/screens/splash/SplashScreen";
-import RootNavigator from "./src/navigations/RootNavigator";
-import { useSplashScreen } from "./src/store/splashStore";
+import 'react-native-gesture-handler';
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+
+import { linking } from './src/navigations/linking';
+import RootNavigator from './src/navigations/RootNavigator';
 
 const App = () => {
-  const isReady = useSplashScreen(
-    (state) => state.isReady
-  );
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      useSplashScreen.setState({
-        isReady: false
-      });
-    }, 5000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (isReady) {
-    return (
-      <SafeAreaProvider>
-        <SplashScreen />
-      </SafeAreaProvider>
-    );
-  }
-
   return (
-    <SafeAreaProvider>
-      <NavigationContainer>
-        <RootNavigator />
-      </NavigationContainer>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <NavigationContainer linking={linking}>
+          <RootNavigator />
+        </NavigationContainer>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 };
 

@@ -1,138 +1,246 @@
-import { KeyboardAvoidingView, Pressable, StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { MotiView, MotiImage } from 'moti'
-import { Easing } from 'react-native-reanimated'
-import AntDesign from '@expo/vector-icons/AntDesign'
-import { useNavigation } from '@react-navigation/native'
+import React from 'react';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import {
+  Image,
+  KeyboardAvoidingView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import { MotiView } from 'moti';
+import { Easing } from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import Button from '../../components/ui/Button';
+import { onboardingContent } from '../../constants/mockData';
+import { useAuth } from '../../hooks/useAuth';
+import { RootStackParamList } from '../../navigations/types';
 
 const OnBoardingScreen = () => {
-    const navigation = useNavigation<any>()
-    const handleGetStarted = async () => {
-        const user = await AsyncStorage.getItem("user");
-        if (user) {
-            navigation.replace("Home")
-        } else {
-            navigation.replace("Auth")
-        }
-    }
-    return (
-        <SafeAreaView style={styles.container}>
-            <KeyboardAvoidingView behavior='padding' style={styles.container}>
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const { completeOnboarding, isAuthenticated } = useAuth();
 
-                {/* Title animates down from above */}
+  const handleGetStarted = () => {
+    completeOnboarding();
+    navigation.replace(isAuthenticated ? 'Home' : 'Auth');
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#040507" />
+      <KeyboardAvoidingView behavior="padding" style={styles.container}>
+        <MotiView
+          style={styles.indicatorRow}
+          from={{ opacity: 0, translateY: -12 }}
+          animate={{ opacity: 1, translateY: 0 }}
+          transition={{
+            type: 'timing',
+            duration: 500,
+            easing: Easing.out(Easing.cubic),
+          }}
+        >
+          {[0, 1, 2].map((item) => (
+            <View
+              key={item}
+              style={[
+                styles.indicator,
+                item === onboardingContent.progress - 1 &&
+                  styles.indicatorActive,
+              ]}
+            />
+          ))}
+        </MotiView>
+
+        <MotiView
+          style={styles.heroWrap}
+          from={{ opacity: 0, translateY: 36, scale: 0.96 }}
+          animate={{ opacity: 1, translateY: 0, scale: 1 }}
+          transition={{
+            type: 'timing',
+            duration: 850,
+            easing: Easing.out(Easing.cubic),
+            delay: 120,
+          }}
+        >
+          <MotiView
+            from={{ scale: 1 }}
+            animate={{ scale: 1.05 }}
+            transition={{
+              type: 'timing',
+              duration: 7200,
+              loop: true,
+              repeatReverse: true,
+            }}
+            style={styles.heroMotion}
+          >
+            <Image
+              source={require('../../../assets/onboarding.png')}
+              style={styles.heroImage}
+            />
+          </MotiView>
+        </MotiView>
+
+        <View pointerEvents="none" style={styles.bottomFade} />
+
+        <MotiView
+          style={styles.copyCard}
+          from={{ opacity: 0, translateY: 34 }}
+          animate={{ opacity: 1, translateY: 0 }}
+          transition={{
+            type: 'timing',
+            duration: 650,
+            easing: Easing.out(Easing.cubic),
+            delay: 260,
+          }}
+        >
+          <View style={styles.chipRow}>
+            {['Fast delivery', 'Live tracking', 'Saved orders'].map(
+              (label, index) => (
                 <MotiView
-                    style={styles.textContainer}
-                    from={{ opacity: 0, translateY: -60 }}
-                    animate={{ opacity: 1, translateY: 0 }}
-                    transition={{
-                        type: 'timing',
-                        duration: 700,
-                        easing: Easing.out(Easing.exp),
-                        delay: 100,
-                    }}
+                  key={label}
+                  from={{ opacity: 0, translateY: 12, scale: 0.94 }}
+                  animate={{ opacity: 1, translateY: 0, scale: 1 }}
+                  transition={{
+                    type: 'timing',
+                    duration: 480,
+                    delay: 420 + index * 90,
+                    easing: Easing.out(Easing.exp),
+                  }}
                 >
-                    <Text style={styles.title}>
-                        Bite <Text style={styles.accent}>&</Text> Chill
-                    </Text>
+                  <View style={styles.chip}>
+                    <Text style={styles.chipText}>{label}</Text>
+                  </View>
                 </MotiView>
+              )
+            )}
+          </View>
 
-                {/* Image slides up from below (behind the button) */}
-                <MotiImage
-                    source={require("../../../assets/onboarding.png")}
-                    style={styles.image}
-                    from={{ opacity: 0, translateY: 120 }}
-                    animate={{ opacity: 1, translateY: 0 }}
-                    transition={{
-                        type: 'timing',
-                        duration: 900,
-                        easing: Easing.out(Easing.cubic),
-                        delay: 200,
-                    }}
-                />
+          <Text style={styles.headline}>
+            Your cravings, tracking, and checkout in one smooth flow.
+          </Text>
+          <Text style={styles.copy}>
+            Browse restaurants, search quickly, and keep your placed orders saved
+            after reload.
+          </Text>
+        </MotiView>
 
-                {/* Button fades + slides up last */}
-                <MotiView
-                    style={styles.buttonWrapper}
-                    from={{ opacity: 0, translateY: 40 }}
-                    animate={{ opacity: 1, translateY: 0 }}
-                    transition={{
-                        type: 'timing',
-                        duration: 600,
-                        easing: Easing.out(Easing.exp),
-                        delay: 700,
-                    }}
-                >
-                    <Pressable
-                        style={styles.button}
-                        onPress={handleGetStarted}
-                    >
-                        <View style={styles.buttonContent}>
-                            <Text style={styles.buttonText}>Get Started</Text>
-                            <AntDesign name="arrow-right" size={24} color="white" />
-                        </View>
-                    </Pressable>
-                </MotiView>
+        <MotiView
+          style={styles.buttonWrapper}
+          from={{ opacity: 0, translateY: 28 }}
+          animate={{ opacity: 1, translateY: 0 }}
+          transition={{
+            type: 'timing',
+            duration: 550,
+            easing: Easing.out(Easing.exp),
+            delay: 420,
+          }}
+        >
+          <Button
+            onPress={handleGetStarted}
+            title={onboardingContent.buttonLabel}
+            variant="primary"
+            style={styles.button}
+          />
+        </MotiView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
+};
 
-            </KeyboardAvoidingView>
-        </SafeAreaView>
-    )
-}
-
-export default OnBoardingScreen
+export default OnBoardingScreen;
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    image: {
-        width: "100%",
-        height: "100%",
-        resizeMode: "cover",
-    },
-    buttonWrapper: {
-        position: "absolute",
-        bottom: 20,
-        width: "80%",
-        alignSelf: "center",
-    },
-    button: {
-        height: 50,
-        backgroundColor: "#ff6a00",
-        borderRadius: 20,
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    buttonText: {
-        color: "#fff",
-        fontSize: 20,
-        fontWeight: "bold",
-    },
-    textContainer: {
-        position: "absolute",
-        top: 60,
-        left: 20,
-        right: 20,
-        zIndex: 10,
-        elevation: 10,
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    title: {
-        color: '#FFFFFF',
-        fontSize: 44,
-        fontWeight: '900',
-        letterSpacing: -0.5,
-    },
-    accent: {
-        color: '#FF6A00',
-    },
-    buttonContent: {
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center",
-        gap: 25,
-        paddingHorizontal: 20,
-    },
-})
+  container: {
+    flex: 1,
+    backgroundColor: '#040507',
+  },
+  indicatorRow: {
+    position: 'absolute',
+    top: 18,
+    alignSelf: 'center',
+    zIndex: 5,
+    flexDirection: 'row',
+    gap: 8,
+  },
+  indicator: {
+    width: 18,
+    height: 4,
+    borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.28)',
+  },
+  indicatorActive: {
+    width: 28,
+    backgroundColor: '#FF6A00',
+  },
+  heroWrap: {
+    flex: 1,
+  },
+  heroMotion: {
+    flex: 1,
+  },
+  heroImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  bottomFade: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    left: 0,
+    height: 240,
+    backgroundColor: 'rgba(4,5,7,0.22)',
+  },
+  copyCard: {
+    position: 'absolute',
+    right: 24,
+    bottom: 120,
+    left: 24,
+    zIndex: 4,
+  },
+  chipRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginBottom: 18,
+  },
+  chip: {
+    borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.16)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  chipText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  headline: {
+    color: '#FFFFFF',
+    fontSize: 28,
+    fontWeight: '900',
+    lineHeight: 34,
+  },
+  copy: {
+    marginTop: 10,
+    color: 'rgba(255,255,255,0.82)',
+    fontSize: 14,
+    lineHeight: 22,
+    maxWidth: 360,
+  },
+  buttonWrapper: {
+    position: 'absolute',
+    right: 24,
+    bottom: 28,
+    left: 24,
+  },
+  button: {
+    minHeight: 62,
+    borderRadius: 24,
+  },
+});

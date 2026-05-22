@@ -12,10 +12,28 @@ const SplashScreen = () => {
     <SafeAreaView style={styles.container}>
       {/* Background glow behind the scooter */}
       <MotiView
-        from={{ opacity: 0, scale: 0.6 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ type: 'timing', duration: 1800, delay: 200 }}
+        from={{ opacity: 0.08, scale: 0.72 }}
+        animate={{ opacity: 0.22, scale: 1.08 }}
+        transition={{
+          type: 'timing',
+          duration: 2600,
+          delay: 200,
+          loop: true,
+          repeatReverse: true,
+        }}
         style={styles.ambientGlow}
+      />
+      <MotiView
+        from={{ opacity: 0.04, scale: 0.82, translateY: 18 }}
+        animate={{ opacity: 0.16, scale: 1.02, translateY: -8 }}
+        transition={{
+          type: 'timing',
+          duration: 3200,
+          delay: 320,
+          loop: true,
+          repeatReverse: true,
+        }}
+        style={styles.secondaryGlow}
       />
 
       <View style={styles.contentContainer}>
@@ -118,8 +136,17 @@ const styles = StyleSheet.create({
     width: 380,
     height: 380,
     borderRadius: 999,
-    backgroundColor: 'rgba(255, 106, 0, 0.08)', // Slightly richer glow
+    backgroundColor: 'rgba(255, 106, 0, 0.12)', // Slightly richer glow
     top: '25%',
+  },
+  secondaryGlow: {
+    position: 'absolute',
+    width: 260,
+    height: 260,
+    borderRadius: 999,
+    backgroundColor: 'rgba(255, 102, 200, 0.08)',
+    bottom: '24%',
+    left: '8%',
   },
 
   contentContainer: {
